@@ -1,0 +1,19 @@
+{
+  "name": "svelte-native",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NivKeidan/svelte-native.git"
+  },
+  "author": "Niv Keidan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NivKeidan/svelte-native/issues"
+  },
+  "homepage": "https://github.com/NivKeidan/svelte-native#readme"
+}
