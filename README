@@ -1,0 +1,7 @@
+Mobile Client for Cheeky's Calendar
+--------------------------------------
+
+This client is extremely simple, implemented with Svelte Native (NativeScript).
+
+This client only reads data.
+In the future it might have other features
