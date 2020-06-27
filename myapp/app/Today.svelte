@@ -5,18 +5,17 @@
 
     export let entries = [];
 
-    export let handleSwipeFunc;
-
 </script>
 
 <page>
+    <actionBar title="Today"/>
     <stackLayout>
-        <listView items="{entries}" on:swipe={handleSwipe}>
-            <Template let:item height="10%">
-                <label>
-                    <span text="{getDisplayString(item.time)}"/>
-                    <span text="{item.text}" textWrap="true" />
-                </label>
+        <listView items="{entries}" on:swipe={handleSwipe} height="100%">
+            <Template let:item>
+                <gridLayout columns="50, *" rows="*">
+                    <label row="0" col="0" text="{getDisplayString(item.time)}"/>
+                    <label row="0" col="1" text="{item.text}" textWrap="true" />
+                </gridLayout>
             </Template>
         </listView>
     </stackLayout>

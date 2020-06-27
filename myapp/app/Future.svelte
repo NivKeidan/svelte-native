@@ -25,10 +25,11 @@
 </script>
 
 <page>
+    <actionBar title="Future"/>
     <stackLayout>
-        <listView items="{Object.keys(datedEntries)}" on:swipe={handleSwipe}>
-            <Template let:item height="15%">
-                <label>
+        <listView items="{Object.keys(datedEntries)}" on:swipe={handleSwipe} height="100%">
+            <Template let:item>
+                <label height="15%">
                     <span text="{getDisplayDate(item)}"/>
                     <span text=" - "/>
                     <span text="{datedEntries[item].map((e) => e.text).join(', ')}" textWrap="true"></span>

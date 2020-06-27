@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/NivKeidan/svelte-native#readme",
   "dependencies": {
+    "js-base64": "^2.5.2",
     "n": "^6.5.1",
     "nativescript": "^6.5.0"
   }

@@ -7,10 +7,11 @@
 </script>
 
 <page>
+    <actionBar title="General"/>
     <stackLayout>
-        <listView items="{entries}" on:swipe={handleSwipe}>
+        <listView items="{entries}" on:swipe={handleSwipe} height="100%">
             <Template let:item>
-                <label height="25%" text="{item.text}" textWrap="true" />
+                <label text="{item.text}" textWrap="true"/>
             </Template>
         </listView>
     </stackLayout>

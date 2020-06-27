@@ -35,9 +35,10 @@
 </script>
 
 <page>
+    <actionBar title="Upcoming"/>
     <stackLayout>
-        <listView items="{Object.keys(datedEntries)}" on:swipe={handleSwipe}>
-            <Template let:item height="15%">
+        <listView items="{Object.keys(datedEntries)}" height="100%" on:swipe={handleSwipe}>
+            <Template let:item>
                 <label textWrap="{true}">
                     <span text="{getDayName(item)}"/>
                     <span text=" - "/>
@@ -47,7 +48,7 @@
                             return t + ' ' + e.text;
                         else
                             return e.text;
-                    }).join(' | ')}"></span>
+                    }).join(' |::| ')}"></span>
                 </label>
             </Template>
         </listView>

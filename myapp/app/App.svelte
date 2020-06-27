@@ -8,33 +8,85 @@
     import { timeCompareFn} from './time';
     import { getDaysFromToday } from './date';
     import { SwipeDirection } from "tns-core-modules/ui/gestures";
-    import { PAGES, NO_DATE } from "./constants";
+    import { PAGES, NO_DATE, LOCAL_DATA_STRING, LOCAL_TIMESTAMP_STRING } from "./constants";
+    import { getString, setString } from "tns-core-modules/application-settings";
 
-    const orderedPageNames = [PAGES.GENERAL, PAGES.TODAY, PAGES.UPCOMING, PAGES.FUTURE];
-    const delayBetweenServerReachAttempts = 10000;
+    const delayBetweenServerReachAttempts = 3000;
     let currentPage = PAGES.TODAY;
     let offline = true;
-    let afterInitialLoad = false;
     let todayEntries = [];
     let upcomingEntries = [];
     let futureEntries = [];
     let generalEntries = [];
     let highestId = 0;
+    let latestTimestamp = 0;
+    let headers = null;
 
     onMount( async () => {
         await loadDataFromServer();
     });
 
+    function loadLocalData() {
+        const d = getString(LOCAL_DATA_STRING);
+        const ts = getString(LOCAL_TIMESTAMP_STRING);
+        if (ts > latestTimestamp) {
+            populatePages(JSON.parse(d)).then(() => {
+                latestTimestamp = ts;
+            })
+        }
+    }
+
+    function saveLocalData(d, ts) {
+        setString(LOCAL_DATA_STRING, JSON.stringify(d));
+        setString(LOCAL_TIMESTAMP_STRING, ts);
+    }
+
+    function validateHeaders() {
+        if (headers === null) {
+            headers = new Headers();
+            headers.append('Content-Type', 'application/json');
+            headers.append('Authorization', 'Basic ' + basicAuthString);
+        }
+    }
+
+    function propsToStr(obj) {
+        let str = '';
+        for (let prop in obj) {
+            str += prop + "=" + obj[prop] + ",";
+        }
+        return str;
+    }
+
     function loadDataFromServer() {
-        fetch("http://1f00bb37f0ef.ngrok.io").then(r => r.json()).then(data => {
-            clearEntries();
-            populatePages(data);
+        validateHeaders();
+        fetch(SERVER_ADDRESS, {
+            method: 'GET',
+            headers: headers,
+        }).then(r => {
+            if (r.ok)
+                return r.json();
+            else
+                throw r;
+        }).then(data => {
             offline = false;
-            afterInitialLoad = true;
+
+            if (data.timestamp > latestTimestamp) {
+                populatePages(data.data).then( () => {
+                    latestTimestamp = data.timestamp;
+                    saveLocalData(data.data, data.timestamp);
+                })
+            }
+
             setTimeout(loadDataFromServer, delayBetweenServerReachAttempts);
         }).catch(e => {
-            console.log("failed loading data", e);
+            let propertyNames = Object.getOwnPropertyNames(e);
+            propertyNames.forEach(function(property) {
+                let descriptor = Object.getOwnPropertyDescriptor(e, property);
+                console.log(property + ":" + e[property] + ":" + propsToStr(descriptor));
+            });
+            console.log("failed loading data: ", e);
             offline = true;
+            loadLocalData();
             setTimeout(loadDataFromServer, delayBetweenServerReachAttempts);
         });
     }
@@ -46,7 +98,8 @@
         generalEntries = [];
     }
 
-    function populatePages(data) {
+    async function populatePages(data) {
+        clearEntries();
         data.forEach(e => insertEntry(e));
     }
 
@@ -157,6 +210,8 @@
             nextPage = getNextPageName();
         else if (args.direction === SwipeDirection.right)
             nextPage = getPrevPageName();
+        else
+            return null;
         if (nextPage === null) {
             return;
         }
@@ -170,10 +225,10 @@
 
 </script>
 
-<page>
-    <stackLayout>
-            <activityIndicator top="0" left="0" busy={offline}/>
-        <frame top="0" left="0" height="100%" width="100%" id="main_frame" on:swipe={handleSwipe}>
+<page actionBarHidden="true">
+    <stackLayout >
+        <activityIndicator busy={offline}/>
+        <frame id="main_frame" on:swipe={handleSwipe}>
             <Today bind:entries={todayEntries}/>
         </frame>
     </stackLayout>
